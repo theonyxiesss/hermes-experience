@@ -1,0 +1,1 @@
+User insists on real, verifiable results over fabricated outputs; requires structured data extraction with explicit failure reporting; operates in Russian (work tasks in Russian, expects concise factual reports); maintains a local Obsidian knowledge base; uses PARA organization; wants GDIR to persist state and not invent names/metrics when extraction fails.

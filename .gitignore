@@ -1,0 +1,13 @@
+# Секреты и локальные данные Hermes — никогда не коммитить
+.env
+auth.json
+*.db
+*.db-shm
+*.db-wal
+*.lock
+sessions/
+logs/
+cache/
+embeddings/
+__pycache__/
+*.pyc

@@ -1,0 +1,1 @@
+User is a Senior AI Systems Architect and engineer focused on building personal knowledge systems using PARA methodology combined with LLM Wiki principles.

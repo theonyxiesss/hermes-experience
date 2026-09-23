@@ -1,0 +1,834 @@
+{
+  "_readme": "База источников вакансий по категориям. access: 'api' (есть официальный API), 'rss' (есть RSS/JSON-фид), 'scrape' (только парсинг HTML — риск нарушения ToS, включать по своему усмотрению), 'manual' (только вручную). enabled: включён ли источник в search_jobs.py / будущие адаптеры по умолчанию.",
+  "categories": [
+    {
+      "category": "IT / Tech (международные)",
+      "sources": [
+        {
+          "name": "Wellfound (AngelList)",
+          "url": "https://wellfound.com",
+          "access": "scrape",
+          "notes": "Стартапы и tech-компании. Бывший AngelList Talent. API закрыт для новых.",
+          "enabled": true
+        },
+        {
+          "name": "StackOverflow Jobs",
+          "url": "https://stackoverflow.com/jobs",
+          "access": "scrape",
+          "notes": "Интегрировано в SO, доступно по поиску. RSS есть.",
+          "enabled": true
+        },
+        {
+          "name": "Dice",
+          "url": "https://dice.com",
+          "access": "scrape",
+          "notes": "Крупная US-площадка для IT/tech.",
+          "enabled": true
+        },
+        {
+          "name": "Hired",
+          "url": "https://hired.com",
+          "access": "manual",
+          "notes": "Площадка-маркетплейс, компании сами предлагают. Нет открытого API.",
+          "enabled": false
+        },
+        {
+          "name": "BuiltIn",
+          "url": "https://builtin.com/jobs",
+          "access": "scrape",
+          "notes": "Tech-вакансии по городам США. Нет публичного API.",
+          "enabled": true
+        },
+        {
+          "name": "Otta",
+          "url": "https://otta.com",
+          "access": "manual",
+          "notes": "Curated tech-вакансии (UK/EU/US). Только через сайт.",
+          "enabled": false
+        },
+        {
+          "name": "Arc.dev",
+          "url": "https://arc.dev/remote-jobs",
+          "access": "scrape",
+          "notes": "Бывший Codementor X. Remote dev jobs.",
+          "enabled": true
+        },
+        {
+          "name": "Authentic Jobs",
+          "url": "https://authenticjobs.com",
+          "access": "rss",
+          "api_url": "https://authenticjobs.com/rss/index.xml",
+          "notes": "Дизайн/фронтенд/tech. Есть RSS.",
+          "enabled": true
+        },
+        {
+          "name": "NoFluffJobs",
+          "url": "https://nofluffjobs.com",
+          "access": "scrape",
+          "notes": "Восточная Европа (Польша, Украина, Венгрия). IT-вакансии с прозрачными зарплатами.",
+          "enabled": true
+        },
+        {
+          "name": "YCombinator Jobs",
+          "url": "https://www.ycombinator.com/jobs",
+          "access": "scrape",
+          "notes": "Вакансии из YC-стартапов. Также есть ежемесячный тред 'Who is Hiring' на Hacker News.",
+          "enabled": true
+        },
+        {
+          "name": "HN Who Is Hiring",
+          "url": "https://news.ycombinator.com",
+          "api_url": "https://hacker-news.firebaseio.com/v0/",
+          "access": "api",
+          "auth_required_for_search": false,
+          "notes": "Ежемесячный тред 'Ask HN: Who is hiring?' — можно парсить через HN API (бесплатный, без ключа).",
+          "enabled": true
+        },
+        {
+          "name": "Key Values",
+          "url": "https://keyvalues.com",
+          "access": "scrape",
+          "notes": "Tech-вакансии фильтруются по культуре компании.",
+          "enabled": true
+        },
+        {
+          "name": "Glassdoor Jobs",
+          "url": "https://glassdoor.com/Job",
+          "access": "scrape",
+          "notes": "Огромный объём + отзывы о компании. Активно блокирует ботов.",
+          "enabled": true
+        },
+        {
+          "name": "DevITjobs",
+          "url": "https://devitjobs.com",
+          "access": "scrape",
+          "notes": "European dev jobs, transparent salaries.",
+          "enabled": true
+        },
+        {
+          "name": "Relocate.me",
+          "url": "https://relocate.me",
+          "access": "scrape",
+          "notes": "Вакансии с релокацией, в основном Европа.",
+          "enabled": true
+        },
+        {
+          "name": "SwissDevJobs",
+          "url": "https://swissdevjobs.ch",
+          "access": "scrape",
+          "notes": "Dev-вакансии в Швейцарии.",
+          "enabled": true
+        },
+        {
+          "name": "GermanTech Jobs",
+          "url": "https://germantechjobs.de",
+          "access": "scrape",
+          "notes": "Tech-вакансии в Германии.",
+          "enabled": true
+        },
+        {
+          "name": "Arbeitnow",
+          "url": "https://arbeitnow.com",
+          "api_url": "https://arbeitnow.com/api/job-board-api",
+          "access": "api",
+          "auth_required_for_search": false,
+          "notes": "European job board. Бесплатный JSON API без ключа.",
+          "enabled": true
+        },
+        {
+          "name": "Himalayas",
+          "url": "https://himalayas.app",
+          "api_url": "https://himalayas.app/jobs/api",
+          "access": "api",
+          "auth_required_for_search": false,
+          "notes": "Remote tech jobs. Бесплатный JSON API.",
+          "enabled": true
+        },
+        {
+          "name": "4dayweek.io",
+          "url": "https://4dayweek.io",
+          "access": "scrape",
+          "notes": "Вакансии с 4-дневной рабочей неделей.",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "category": "Удалёнка / международные",
+      "sources": [
+        {
+          "name": "RemoteOK",
+          "url": "https://remoteok.com",
+          "api_url": "https://remoteok.com/api",
+          "access": "api",
+          "auth_required_for_search": false,
+          "notes": "Публичный JSON-эндпоинт без ключа, обновляется регулярно.",
+          "enabled": true
+        },
+        {
+          "name": "We Work Remotely",
+          "url": "https://weworkremotely.com",
+          "api_url": "https://weworkremotely.com/categories/remote-programming-jobs.rss",
+          "access": "rss",
+          "notes": "RSS-фиды по категориям, без ключа.",
+          "enabled": true
+        },
+        {
+          "name": "Remotive",
+          "url": "https://remotive.com",
+          "api_url": "https://remotive.com/api/remote-jobs",
+          "access": "api",
+          "auth_required_for_search": false,
+          "notes": "Публичный JSON API, бесплатно.",
+          "enabled": true
+        },
+        {
+          "name": "LinkedIn Jobs",
+          "url": "https://linkedin.com/jobs",
+          "access": "manual",
+          "notes": "Публичного API для поиска вакансий нет; автоматический парсинг нарушает ToS LinkedIn. Оставлено как источник для ручного просмотра, не автоматизируется.",
+          "enabled": false
+        },
+        {
+          "name": "Indeed",
+          "url": "https://indeed.com",
+          "access": "manual",
+          "notes": "Publisher API закрыт для новых партнёров с 2021 года. Автоматизация не рекомендуется без согласования с Indeed.",
+          "enabled": false
+        },
+        {
+          "name": "Remote.co",
+          "url": "https://remote.co/remote-jobs",
+          "access": "scrape",
+          "notes": "Курированный список remote-вакансий. Нет API.",
+          "enabled": true
+        },
+        {
+          "name": "JustRemote",
+          "url": "https://justremote.co",
+          "access": "scrape",
+          "notes": "Remote-вакансии по категориям.",
+          "enabled": true
+        },
+        {
+          "name": "Working Nomads",
+          "url": "https://workingnomads.com/jobs",
+          "access": "api",
+          "api_url": "https://www.workingnomads.com/api/exposed_jobs/",
+          "auth_required_for_search": false,
+          "notes": "Публичный JSON endpoint, remote-вакансии.",
+          "enabled": true
+        },
+        {
+          "name": "Jobicy",
+          "url": "https://jobicy.com",
+          "api_url": "https://jobicy.com/api/v2/remote-jobs",
+          "access": "api",
+          "auth_required_for_search": false,
+          "notes": "Публичный JSON API, remote-вакансии. Поддерживает tag и geo фильтры. До 100 за запрос.",
+          "enabled": true
+        },
+        {
+          "name": "Landing.jobs",
+          "url": "https://landing.jobs",
+          "api_url": "https://landing.jobs/api/v1/offers",
+          "access": "api",
+          "auth_required_for_search": false,
+          "notes": "Публичный JSON API, EU/tech вакансии с зарплатами.",
+          "enabled": true
+        },
+        {
+          "name": "Jobspresso",
+          "url": "https://jobspresso.co",
+          "access": "scrape",
+          "notes": "Curated remote jobs, нет публичного API.",
+          "enabled": true
+        },
+        {
+          "name": "DailyRemote",
+          "url": "https://dailyremote.com",
+          "access": "scrape",
+          "notes": "Remote-вакансии, обновляются ежедневно.",
+          "enabled": true
+        },
+        {
+          "name": "FlexJobs",
+          "url": "https://flexjobs.com",
+          "access": "manual",
+          "notes": "Платная подписка для соискателей. Ручной просмотр.",
+          "enabled": false
+        },
+        {
+          "name": "Pangian",
+          "url": "https://pangian.com",
+          "access": "scrape",
+          "notes": "Remote-вакансии, глобальная площадка.",
+          "enabled": true
+        },
+        {
+          "name": "Nodesk",
+          "url": "https://nodesk.co/remote-jobs",
+          "access": "scrape",
+          "notes": "Курированный список remote-вакансий.",
+          "enabled": true
+        },
+        {
+          "name": "Remote.com",
+          "url": "https://remote.com/jobs",
+          "access": "scrape",
+          "notes": "Global remote work platform.",
+          "enabled": true
+        },
+        {
+          "name": "Dynamite Jobs",
+          "url": "https://dynamitejobs.com",
+          "access": "scrape",
+          "notes": "Remote-first вакансии, проверенные модераторами.",
+          "enabled": true
+        },
+        {
+          "name": "PowerToFly",
+          "url": "https://powertofly.com/jobs",
+          "access": "scrape",
+          "notes": "Diversity-focused remote jobs.",
+          "enabled": true
+        },
+        {
+          "name": "Lemon.io",
+          "url": "https://lemon.io",
+          "access": "manual",
+          "notes": "Маркетплейс для разработчиков из Восточной Европы. Регистрация + отбор.",
+          "enabled": false
+        },
+        {
+          "name": "Turing.com",
+          "url": "https://turing.com/jobs",
+          "access": "scrape",
+          "notes": "Remote dev jobs, AI-matched.",
+          "enabled": true
+        },
+        {
+          "name": "Crossover",
+          "url": "https://crossover.com/jobs",
+          "access": "scrape",
+          "notes": "Remote, высокие зарплаты, строгий отбор.",
+          "enabled": true
+        },
+        {
+          "name": "Contra",
+          "url": "https://contra.com",
+          "access": "scrape",
+          "notes": "Freelance/remote-вакансии, нет комиссии для фрилансеров.",
+          "enabled": true
+        },
+        {
+          "name": "Remoters.net",
+          "url": "https://remoters.net/jobs",
+          "access": "scrape",
+          "notes": "Каталог remote-вакансий.",
+          "enabled": true
+        },
+        {
+          "name": "RemoteHub",
+          "url": "https://remotehub.com",
+          "access": "scrape",
+          "notes": "Remote-first компании и вакансии.",
+          "enabled": true
+        },
+        {
+          "name": "EuroRemote",
+          "url": "https://euroremote.com",
+          "access": "scrape",
+          "notes": "Remote-вакансии только для Европы.",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "category": "Агрегаторы / мета-поиск",
+      "sources": [
+        {
+          "name": "Jooble",
+          "url": "https://jooble.org",
+          "api_url": "https://jooble.org/api/",
+          "access": "api",
+          "auth_required_for_search": true,
+          "notes": "Крупнейший мета-агрегатор (70+ стран). Бесплатный партнёрский API, нужен ключ.",
+          "enabled": false
+        },
+        {
+          "name": "Adzuna",
+          "url": "https://adzuna.com",
+          "api_url": "https://api.adzuna.com/v1/api/jobs",
+          "access": "api",
+          "auth_required_for_search": true,
+          "notes": "Агрегатор (UK, US, DE, AU и др.). Бесплатный API-ключ.",
+          "enabled": false
+        },
+        {
+          "name": "CareerJet",
+          "url": "https://careerjet.com",
+          "api_url": "http://public.api.careerjet.net/search",
+          "access": "api",
+          "auth_required_for_search": true,
+          "notes": "Мета-поиск (60+ стран). Есть affiliate API.",
+          "enabled": false
+        },
+        {
+          "name": "Talent.com (Neuvoo)",
+          "url": "https://talent.com",
+          "access": "scrape",
+          "notes": "Крупный агрегатор (70+ стран). Бывший Neuvoo.",
+          "enabled": true
+        },
+        {
+          "name": "SimplyHired",
+          "url": "https://simplyhired.com",
+          "access": "scrape",
+          "notes": "Агрегатор, принадлежит Indeed. Нет открытого API.",
+          "enabled": true
+        },
+        {
+          "name": "ZipRecruiter",
+          "url": "https://ziprecruiter.com",
+          "access": "scrape",
+          "notes": "US/UK агрегатор. API только для работодателей.",
+          "enabled": true
+        },
+        {
+          "name": "Trovit",
+          "url": "https://trovit.com",
+          "access": "scrape",
+          "notes": "Классифайд-агрегатор (вакансии + недвижимость + авто).",
+          "enabled": true
+        },
+        {
+          "name": "Jobrapido",
+          "url": "https://jobrapido.com",
+          "access": "scrape",
+          "notes": "Мета-агрегатор (50+ стран).",
+          "enabled": true
+        },
+        {
+          "name": "Google for Jobs",
+          "url": "https://google.com/search?q=jobs",
+          "access": "scrape",
+          "notes": "Индексирует вакансии с сотен сайтов. Прямого API нет, но можно парсить SerpAPI/ScrapeOps.",
+          "enabled": false
+        },
+        {
+          "name": "The Muse",
+          "url": "https://themuse.com",
+          "api_url": "https://www.themuse.com/api/public/jobs",
+          "access": "api",
+          "auth_required_for_search": false,
+          "notes": "Бесплатный публичный JSON API без ключа.",
+          "enabled": true
+        },
+        {
+          "name": "Reed.co.uk",
+          "url": "https://reed.co.uk",
+          "api_url": "https://www.reed.co.uk/api/1.0/search",
+          "access": "api",
+          "auth_required_for_search": true,
+          "notes": "UK. Бесплатный API-ключ.",
+          "enabled": false
+        },
+        {
+          "name": "Findwork.dev",
+          "url": "https://findwork.dev",
+          "api_url": "https://findwork.dev/api/jobs/",
+          "access": "api",
+          "auth_required_for_search": true,
+          "notes": "Агрегатор tech-вакансий. Бесплатный API с лимитами.",
+          "enabled": false
+        }
+      ]
+    },
+    {
+      "category": "Фриланс",
+      "sources": [
+        {
+          "name": "Habr Freelance",
+          "url": "https://freelance.habr.com",
+          "access": "scrape",
+          "notes": "IT-фриланс, СНГ.",
+          "enabled": true
+        },
+        {
+          "name": "FL.ru",
+          "url": "https://fl.ru",
+          "access": "scrape",
+          "notes": "Крупнейшая фриланс-площадка СНГ.",
+          "enabled": true
+        },
+        {
+          "name": "Upwork",
+          "url": "https://upwork.com",
+          "api_url": "https://www.upwork.com/api/",
+          "access": "api",
+          "auth_required_for_search": true,
+          "notes": "Есть официальный API, но требует одобрения заявки на партнёрский доступ (OAuth2).",
+          "enabled": false
+        },
+        {
+          "name": "Freelancer.com",
+          "url": "https://freelancer.com",
+          "api_url": "https://www.freelancer.com/api/projects/0.1/projects/active",
+          "access": "api",
+          "auth_required_for_search": true,
+          "notes": "Крупная мировая площадка. Есть API (OAuth2).",
+          "enabled": false
+        },
+        {
+          "name": "Kwork",
+          "url": "https://kwork.ru",
+          "access": "scrape",
+          "notes": "Российский фриланс-маркетплейс.",
+          "enabled": true
+        },
+        {
+          "name": "Guru.com",
+          "url": "https://guru.com",
+          "access": "scrape",
+          "notes": "Международная фриланс-площадка.",
+          "enabled": true
+        },
+        {
+          "name": "PeoplePerHour",
+          "url": "https://peopleperhour.com",
+          "access": "scrape",
+          "notes": "UK/EU фриланс-площадка.",
+          "enabled": true
+        },
+        {
+          "name": "Toptal",
+          "url": "https://toptal.com",
+          "access": "manual",
+          "notes": "Elite freelance network. Строгий отбор, нет публичных листингов для парсинга.",
+          "enabled": false
+        },
+        {
+          "name": "Gun.io",
+          "url": "https://gun.io",
+          "access": "manual",
+          "notes": "Curated freelance для senior разработчиков.",
+          "enabled": false
+        }
+      ]
+    },
+    {
+      "category": "Крупные международные площадки",
+      "sources": [
+        {
+          "name": "Monster",
+          "url": "https://monster.com",
+          "access": "scrape",
+          "notes": "Один из старейших job-бордов. API только для партнёров.",
+          "enabled": true
+        },
+        {
+          "name": "CareerBuilder",
+          "url": "https://careerbuilder.com",
+          "access": "scrape",
+          "notes": "Крупная US-площадка. Нет открытого API.",
+          "enabled": true
+        },
+        {
+          "name": "Ladders",
+          "url": "https://theladders.com",
+          "access": "scrape",
+          "notes": "Вакансии $100K+.",
+          "enabled": true
+        },
+        {
+          "name": "Totaljobs",
+          "url": "https://totaljobs.com",
+          "access": "scrape",
+          "notes": "Крупнейшая UK-площадка (StepStone group).",
+          "enabled": true
+        },
+        {
+          "name": "StepStone",
+          "url": "https://stepstone.de",
+          "access": "scrape",
+          "notes": "Крупнейшая площадка Германии.",
+          "enabled": true
+        },
+        {
+          "name": "XING Jobs",
+          "url": "https://xing.com/jobs",
+          "access": "manual",
+          "notes": "DACH (Германия/Австрия/Швейцария). LinkedIn-аналог для DACH.",
+          "enabled": false
+        },
+        {
+          "name": "Seek",
+          "url": "https://seek.com.au",
+          "access": "scrape",
+          "notes": "Крупнейшая площадка Австралии/Новой Зеландии.",
+          "enabled": true
+        },
+        {
+          "name": "Naukri",
+          "url": "https://naukri.com",
+          "access": "scrape",
+          "notes": "Крупнейшая площадка Индии.",
+          "enabled": true
+        },
+        {
+          "name": "Bayt",
+          "url": "https://bayt.com",
+          "access": "scrape",
+          "notes": "Крупнейшая площадка Ближнего Востока.",
+          "enabled": true
+        },
+        {
+          "name": "CV-Library",
+          "url": "https://cv-library.co.uk",
+          "access": "scrape",
+          "notes": "UK job board.",
+          "enabled": true
+        },
+        {
+          "name": "InfoJobs",
+          "url": "https://infojobs.net",
+          "access": "scrape",
+          "notes": "Испания, крупнейшая площадка.",
+          "enabled": true
+        },
+        {
+          "name": "JobStreet",
+          "url": "https://jobstreet.com",
+          "access": "scrape",
+          "notes": "Юго-Восточная Азия (Малайзия, Филиппины, Индонезия).",
+          "enabled": true
+        },
+        {
+          "name": "Pole Emploi",
+          "url": "https://pole-emploi.fr",
+          "api_url": "https://api.pole-emploi.io/partenaire/offresdemploi/v2/offres/search",
+          "access": "api",
+          "auth_required_for_search": true,
+          "notes": "Госпортал Франции. Бесплатный API после регистрации.",
+          "enabled": false
+        }
+      ]
+    },
+    {
+      "category": "Crypto / Web3 / Blockchain",
+      "sources": [
+        {
+          "name": "CryptoJobsList",
+          "url": "https://cryptojobslist.com",
+          "access": "scrape",
+          "notes": "Crypto/blockchain вакансии.",
+          "enabled": true
+        },
+        {
+          "name": "Web3.career",
+          "url": "https://web3.career",
+          "access": "scrape",
+          "notes": "Web3/blockchain/DeFi вакансии.",
+          "enabled": true
+        },
+        {
+          "name": "CryptoCurrencyJobs",
+          "url": "https://cryptocurrencyjobs.co",
+          "access": "rss",
+          "api_url": "https://cryptocurrencyjobs.co/feed/",
+          "notes": "RSS-фид без ключа.",
+          "enabled": true
+        },
+        {
+          "name": "Blockchain Jobs",
+          "url": "https://blockchainjobs.co",
+          "access": "scrape",
+          "notes": "Blockchain-specific вакансии.",
+          "enabled": true
+        },
+        {
+          "name": "Crypto Jobs",
+          "url": "https://crypto.jobs",
+          "access": "scrape",
+          "notes": "Crypto/Web3 вакансии.",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "category": "AI / ML / Data",
+      "sources": [
+        {
+          "name": "AI Jobs",
+          "url": "https://aijobs.net",
+          "access": "scrape",
+          "notes": "AI/ML-специализация.",
+          "enabled": true
+        },
+        {
+          "name": "MLJobs",
+          "url": "https://mljobs.io",
+          "access": "scrape",
+          "notes": "Machine learning вакансии.",
+          "enabled": true
+        },
+        {
+          "name": "DataJobs",
+          "url": "https://datajobs.com",
+          "access": "scrape",
+          "notes": "Data science / analytics / engineering.",
+          "enabled": true
+        },
+        {
+          "name": "Kaggle Jobs",
+          "url": "https://kaggle.com/discussions?topic=jobs",
+          "access": "scrape",
+          "notes": "Раздел вакансий на Kaggle.",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "category": "Нишевые / специализированные",
+      "sources": [
+        {
+          "name": "Dribbble Jobs",
+          "url": "https://dribbble.com/jobs",
+          "access": "rss",
+          "notes": "Дизайн/UX/UI вакансии. RSS: dribbble.com/jobs.rss (~54 вакансий).",
+          "enabled": true
+        },
+        {
+          "name": "Python.org Jobs",
+          "url": "https://www.python.org/jobs/",
+          "access": "rss",
+          "notes": "Официальная доска вакансий Python. RSS: python.org/jobs/feed/rss/ (~20 вакансий).",
+          "enabled": true
+        },
+        {
+          "name": "LaraJobs",
+          "url": "https://larajobs.com",
+          "access": "rss",
+          "notes": "Laravel/PHP вакансии. RSS: larajobs.com/feed (~10 вакансий).",
+          "enabled": true
+        },
+        {
+          "name": "Behance Jobs",
+          "url": "https://behance.net/joblist",
+          "access": "scrape",
+          "notes": "Creative/дизайн вакансии.",
+          "enabled": true
+        },
+        {
+          "name": "Product Hunt Jobs",
+          "url": "https://producthunt.com/jobs",
+          "access": "scrape",
+          "notes": "Стартапы, PM, маркетинг.",
+          "enabled": true
+        },
+        {
+          "name": "AngelList",
+          "url": "https://angel.co",
+          "access": "scrape",
+          "notes": "Startup jobs.",
+          "enabled": true
+        },
+        {
+          "name": "GameJobs.co",
+          "url": "https://gamejobs.co",
+          "access": "scrape",
+          "notes": "Gamedev вакансии.",
+          "enabled": true
+        },
+        {
+          "name": "Hitmarker",
+          "url": "https://hitmarker.net",
+          "access": "scrape",
+          "notes": "Gaming/esports вакансии.",
+          "enabled": true
+        },
+        {
+          "name": "ClimateTechList",
+          "url": "https://climatetechlist.com",
+          "access": "scrape",
+          "notes": "Climate/sustainability tech вакансии.",
+          "enabled": true
+        },
+        {
+          "name": "EthicalJobs",
+          "url": "https://ethicaljobs.com.au",
+          "access": "scrape",
+          "notes": "Некоммерческий сектор, Австралия.",
+          "enabled": true
+        },
+        {
+          "name": "Idealist",
+          "url": "https://idealist.org",
+          "access": "scrape",
+          "notes": "Некоммерческий/social impact.",
+          "enabled": true
+        },
+        {
+          "name": "USAJobs",
+          "url": "https://usajobs.gov",
+          "api_url": "https://data.usajobs.gov/api/Search",
+          "access": "api",
+          "auth_required_for_search": true,
+          "notes": "Госслужба США. Бесплатный API (нужен ключ).",
+          "enabled": false
+        }
+      ]
+    },
+    {
+      "category": "Telegram-каналы (парсинг сообщений)",
+      "sources": [
+        {
+          "name": "Telegram: @devjobs",
+          "url": "https://t.me/devjobs",
+          "access": "scrape",
+          "notes": "Через Telethon/Pyrogram можно парсить сообщения с вакансиями из Telegram-каналов.",
+          "enabled": false
+        },
+        {
+          "name": "Telegram: @remote_job_russia",
+          "url": "https://t.me/remote_job_russia",
+          "access": "scrape",
+          "notes": "Удалённые вакансии, РФ.",
+          "enabled": false
+        },
+        {
+          "name": "Telegram: @fordev",
+          "url": "https://t.me/fordev",
+          "access": "scrape",
+          "notes": "IT-вакансии.",
+          "enabled": false
+        },
+        {
+          "name": "Telegram: @jobforjunior",
+          "url": "https://t.me/jobforjunior",
+          "access": "scrape",
+          "notes": "Вакансии для джунов.",
+          "enabled": false
+        },
+        {
+          "name": "Telegram: @thisisitmir",
+          "url": "https://t.me/thisisitmir",
+          "access": "scrape",
+          "notes": "IT-вакансии.",
+          "enabled": false
+        }
+      ]
+    }
+  ],
+  "default_enabled_for_v1": "all with adapters",
+  "how_to_enable_more": "Поменяйте enabled на true и, если нужен ключ (api_url с auth_required_for_search=true), добавьте его в переменные окружения скилла (см. SKILL.md -> required_environment_variables).",
+  "stats": {
+    "total_sources": 81,
+    "with_free_api": 12,
+    "with_paid_api": 8,
+    "with_rss": 4,
+    "scrape_only": 49,
+    "manual_only": 8
+  }
+}
