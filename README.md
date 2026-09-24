@@ -1,62 +1,62 @@
-# Hermes Agent — накопленный опыт
+# Hermes Agent — Learned Experience
 
-Память, личность и навыки, которые мой AI-агент [Hermes](https://github.com/NousResearch/hermes-agent) выработал в процессе обучения. Это не форк Hermes, а «слепок опыта»: то, что агент сам записал в память и создал как навыки, работая над реальными задачами.
+The memory, personality and skills that my AI agent [Hermes](https://github.com/NousResearch/hermes-agent) developed while being trained on real tasks. This is not a fork of Hermes. It is a snapshot of experience: what the agent wrote into its own long-term memory and the skills it built for itself.
 
-## Принципы, которым научился агент
+## Principles the agent learned
 
-Из долговременной памяти (`memories/`):
+From its long-term memory (`memories/`):
 
-- **Никакой выдумки.** Не придумывать имена, URL, метрики и клиентов. Честный `PARTIAL` или `FAILURE` лучше фальшивой полноты.
-- **Только реальные инструменты:** curl, oEmbed, настоящие API, без моков.
-- **Доказательства для каждого утверждения** и статусы `VERIFIED / PARTIAL / UNKNOWN / FAILURE`.
-- **Против подтверждающего искажения:** обязательно искать опровергающие данные.
-- **Честно сообщать об ограничениях** и узких местах.
-- Работать на русском, отчёты — короткие и по фактам.
+- **No fabrication.** Never invent names, URLs, metrics or clients. An honest `PARTIAL` or `FAILURE` beats fake completeness.
+- **Real tools only:** curl, oEmbed, real APIs. No mocks.
+- **Evidence for every claim**, with explicit statuses: `VERIFIED / PARTIAL / UNKNOWN / FAILURE`.
+- **Anti-confirmation bias:** always look for contradicting evidence.
+- **Honest reporting** of limitations and bottlenecks.
+- Concise, fact-based reports.
 
-## Навыки
+## Skills
 
 ### 💼 JobHunter — `skills/career/jobhunter`
-Автоматический поиск работы. Собирает вакансии из множества источников, дёшево отсеивает их кодом, а спорные случаи отдаёт LLM (анализ вакансии и сопоставление с резюме). Затем готовит персональный отклик, присылает его в Telegram и при желании подаёт заявку через API hh.ru.
-- Скоринг 0–100 и порог уведомления (по умолчанию 70)
-- Запуск по расписанию (по умолчанию каждые 3 часа)
-- Подробности: `ARCHITECTURE.md`, `PROTOCOL.md`
+Automated job search. It collects vacancies from many sources, filters them cheaply in code, and sends ambiguous cases to an LLM for vacancy analysis and CV matching. It then drafts a personalized application, sends it to Telegram and can optionally apply through the hh.ru API.
+- 0–100 match score with a notification threshold (default 70)
+- Scheduled runs (default every 3 hours)
+- Details: `ARCHITECTURE.md`, `PROTOCOL.md`
 
 ### 🔍 GDIR (Goal-Driven Research) — `skills/research/goal-driven-research`
-Исследование «от цели»: агент получает задачу («найди 10 потенциальных клиентов…») и проходит конвейер **Discovery → Enrichment → Signal Detection → Qualification → Verification**. Каждый кандидат проверяется по реальным источникам, результат сохраняется со статусом проверки. Внутри скрипты для структурного извлечения из HTML, обогащения данными с официальных сайтов и исследования публичных YouTube-каналов.
+Research that starts from a goal (for example, "find 10 potential clients…") and runs a pipeline: **Discovery → Enrichment → Signal Detection → Qualification → Verification**. Every candidate is checked against real sources, and results are saved with a verification status. Includes scripts for structured HTML extraction, official-website enrichment and public YouTube channel research.
 
 ### 🎯 Lead Signal Engine — `skills/research/lead-signal-engine`
-Коммерческий слой поверх GDIR. Отличает «интересную сущность» от «квалифицированного лида»: находит коммерческие сигналы, квалифицирует их по строгим правилам и оставляет след доказательств для каждого решения. В репозитории есть реальный сквозной тест с честным итогом: `PARTIAL`, 5 найдено, 0 выдумано.
+A commercial reasoning layer on top of GDIR. It separates an "interesting entity" from a "qualified lead": it detects commercial signals, qualifies them with strict rules and keeps an evidence trail for every decision. The repo includes a real end-to-end test with an honest result: `PARTIAL`, 5 found, 0 fabricated.
 
 ### 📚 Local RAG Pipeline — `skills/mlops/local-rag-pipeline`
-Минимальный офлайн-RAG по Markdown-базе знаний (Obsidian / PARA / Zettelkasten) на ChromaDB и sentence-transformers. Один CLI-файл для индексации и поиска, без облачных API.
+A minimal offline RAG over a Markdown knowledge base (Obsidian / PARA / Zettelkasten), built on ChromaDB and sentence-transformers. One CLI file for indexing and querying, with no cloud APIs.
 
-## Профиль DATA MIND — `profiles/data-mnd/`
+## DATA MIND profile — `profiles/data-mnd/`
 
-Отдельная «личность» агента для работы с личной базой знаний по принципу **Knowledge First**: прежде чем отвечать о проектах и решениях, агент ищет в базе и указывает источник.
+A separate agent persona for working with a personal knowledge base, following a **Knowledge First** rule: before answering about projects or decisions, the agent searches the knowledge base and cites the source.
 
-- `SOUL.md` — инструкции профиля: приоритет источников, порядок поиска, формат цитирования
-- `knowledge/` — код поиска: чанкинг Markdown, эмбеддинги, FAISS-индекс, гибридный поиск (точный + векторный), сборка контекста с указанием источника
-- `skills/research/knowledge-system` — как строить и поддерживать эту инфраструктуру, включая разбор найденных багов
-- `skills/research/knowledge-search` — навык быстрого поиска по базе
+- `SOUL.md`: persona instructions covering source priority, search order and citation format
+- `knowledge/`: the retrieval code. Markdown chunking, embeddings, a FAISS index, hybrid search (exact + vector) and context assembly with provenance
+- `skills/research/knowledge-system`: how to build and maintain this infrastructure, including a write-up of bugs found along the way
+- `skills/research/knowledge-search`: a skill for quick knowledge-base search
 
-## Структура
+## Layout
 
 ```
-SOUL.md                  базовая личность агента
-memories/                долговременная память (правила и предпочтения)
-skills/                  навыки, созданные агентом
-profiles/data-mnd/       профиль DATA MIND: SOUL, память, навыки, код knowledge/
+SOUL.md                  base agent personality
+memories/                long-term memory (rules and preferences)
+skills/                  skills created by the agent
+profiles/data-mnd/       DATA MIND profile: SOUL, memory, skills, knowledge/ code
 ```
 
-## Установка
+## Installation
 
-Скопируйте файлы в папку Hermes (`%LOCALAPPDATA%\hermes` на Windows, `~/.hermes` на Linux/macOS):
+Copy the files into your Hermes folder (`%LOCALAPPDATA%\hermes` on Windows, `~/.hermes` on Linux/macOS):
 
 - `skills/*` → `<hermes>/skills/`
 - `profiles/data-mnd/*` → `<hermes>/profiles/data-mnd/`
 
-Ключей API и токенов здесь нет. Нужные переменные (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `HH_ACCESS_TOKEN`, `WIKI_PATH` и т.д.) задайте в своём `.env`.
+No API keys or tokens are included. Set the required variables (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `HH_ACCESS_TOKEN`, `WIKI_PATH`, etc.) in your own `.env`.
 
-## Что намеренно не включено
+## Intentionally excluded
 
-Ключи (`.env`, `auth.json`), история сессий (`state.db`), логи, кэш и векторный индекс личных заметок.
+Keys (`.env`, `auth.json`), session history (`state.db`), logs, caches and the vector index of personal notes.

@@ -1,4 +1,4 @@
-# Секреты и локальные данные Hermes — никогда не коммитить
+# Hermes secrets and local data — never commit
 .env
 auth.json
 *.db
