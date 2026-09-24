@@ -17,8 +17,8 @@ category: research
 Use this skill when the user asks a question about their personal knowledge base (DATA MIND). This includes:
 
 - Projects: `zarabotok`, `crypto-card-bot`, `lichnyj-brend`, `tg-mini-games`
-- Status: `Какой статус проекта X?`, `Что сейчас в работе?`
-- Decisions: `Что я решил насчёт X?`
+- Status: `What is the status of project X?`, `What am I working on now?`
+- Decisions: `What did I decide about X?`
 - Areas: `финансы`, `growth`, `health`
 - People: `devushka`, `relationships`, `semya`
 - Any question about information stored in the DATA MIND vault

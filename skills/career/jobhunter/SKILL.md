@@ -1,6 +1,6 @@
 ---
 name: jobhunter
-description: JobHunter workflow — ищет вакансии, дёшево фильтрует кодом, для неоднозначных случаев зовёт LLM Gateway (анализ вакансии + CV matching), готовит персонализированный отклик и присылает в Telegram (и опционально подаёт заявку через hh.ru API)
+description: JobHunter workflow — searches for vacancies, filters them cheaply in code, calls the LLM Gateway on ambiguous cases (vacancy analysis + CV matching), drafts a personalized application and sends it to Telegram (optionally submits an application via the hh.ru API).
 version: 0.3.0
 platforms: [macos, linux, windows]
 metadata:
@@ -9,126 +9,130 @@ metadata:
     category: career
     config:
       - key: search.interval_hours
-        description: Как часто запускать JobHunter Workflow
+        description: How often to run the JobHunter workflow
         default: "3"
       - key: match.score_threshold
-        description: Минимальный итоговый score (0-100) для уведомления/отклика
+        description: Minimum overall score (0-100) required to notify or apply
         default: "70"
 required_environment_variables:
   - name: TELEGRAM_BOT_TOKEN
-    prompt: Токен вашего Telegram-бота от @BotFather
+    prompt: Your Telegram bot token from @BotFather
   - name: TELEGRAM_CHAT_ID
-    prompt: Chat ID, куда бот будет присылать вакансии (ваш личный чат с ботом)
+    prompt: Chat ID where the bot will send vacancies (your private chat with the bot)
   - name: HH_ACCESS_TOKEN
-    prompt: "(необязательно) OAuth-токен hh.ru для автоподачи откликов — оставьте пустым, если не нужен автопилот"
+    prompt: "(optional) hh.ru OAuth token for auto-applying — leave empty if you don't need autopilot"
   - name: HH_RESUME_ID
-    prompt: "(необязательно) id вашего резюме на hh.ru — нужен только вместе с HH_ACCESS_TOKEN"
+    prompt: "(optional) your hh.ru resume id — required only together with HH_ACCESS_TOKEN"
 ---
 
-# JobHunter — workflow поиска и подачи заявок на вакансии
+# JobHunter — vacancy search and application workflow
 
-Архитектура (полная схема и обоснования — в `ARCHITECTURE.md`, контракт
-LLM-задач — в `PROTOCOL.md`):
+Architecture (full diagram and rationale in `ARCHITECTURE.md`, LLM task
+contract in `PROTOCOL.md`):
 
 ```
-Hermes Coordinator → «Запусти JobHunter» → JobHunter Workflow (scripts/run.py)
-    → Job Sources + Filters + Database (код, без ИИ)
-    → Score/Filter (код, match_score.py) — дешёвый пре-фильтр
-    → LLM Task → LLM Gateway → Hermes Router → модель → vacancy_fit + cv_match
+Hermes Coordinator → "Run JobHunter" → JobHunter Workflow (scripts/run.py)
+    → Job Sources + Filters + Database (code, no AI)
+    → Score/Filter (code, match_score.py) — cheap pre-filter
+    → LLM Task → LLM Gateway → Hermes Router → model → vacancy_fit + cv_match
     → Application Workflow (apply_or_notify.py) → Telegram
-    → JOB_SEARCH_COMPLETED → Hermes → Telegram-сводка
+    → JOB_SEARCH_COMPLETED → Hermes → Telegram summary
 ```
 
 ## When to Use
 
-Используй этот скилл, когда нужно периодически (по расписанию, см.
-`search.interval_hours`) запускать JobHunter Workflow, либо по прямому запросу
-пользователя: «запусти JobHunter», «поищи вакансии сейчас», «проверь новые
-вакансии», «обнови критерии поиска».
+Use this skill when JobHunter needs to run on a schedule (see
+`search.interval_hours`) or on direct user request: "run JobHunter",
+"search for vacancies now", "check new vacancies", "update search
+criteria".
 
 ## Procedure
 
-**Шаг 0 (обычно ничего делать не нужно — подключается автоматически):**
-`run.py` при вызове `run()` сам подключает LLM Gateway через
-`hermes_backend.py` — мост к `hermes -z` (oneshot-режим CLI Hermes Agent),
-который использует ту модель, что уже настроена в `~/.hermes/config.yaml`.
-Ручной вызов `llm_gateway.set_backend(...)` нужен только если вы хотите
-подставить другой backend (например, прямой вызов модели без под-процесса —
-дешевле по латентности) — тогда вызовите его САМИ до `run()` и выставите
-`JOBHUNTER_NO_AUTO_BACKEND=1`, чтобы авто-подключение не перезаписало его:
+**Step 0 (usually nothing to do — auto-wired):**
+When `run()` is called, `run.py` auto-wires the LLM Gateway through
+`hermes_backend.py` — a bridge to `hermes -z` (Hermes Agent CLI oneshot
+mode) which uses the model already configured in `~/.hermes/config.yaml`.
+A manual `llm_gateway.set_backend(...)` call is only needed if you want
+to inject a different backend (e.g. a direct model call without a
+subprocess — lower latency). In that case call it YOURSELF before `run()`
+and set `JOBHUNTER_NO_AUTO_BACKEND=1` so the auto-wiring does not
+overwrite it:
 
 ```python
 import llm_gateway
-llm_gateway.set_backend(lambda task, input: <свой вызов модели по протоколу PROTOCOL.md>)
+llm_gateway.set_backend(lambda task, input: <your model call following PROTOCOL.md>)
 ```
 
-Если backend в итоге не настроен (ни авто, ни вручную — например, команда
-`hermes` недоступна в PATH) — workflow всё равно отработает: `run.py`
-проверяет `llm_gateway.is_configured()` и при отсутствии backend'а использует
-только код-фильтр (`match_score.py`) и шаблонные письма
-(`apply_or_notify.py`), без LLM-уточнения.
+If no backend is configured in the end (neither auto nor manual — e.g.
+the `hermes` command is not in PATH), the workflow still runs: `run.py`
+checks `llm_gateway.is_configured()` and, when the backend is missing,
+falls back to code-only filtering (`match_score.py`) and template
+messages (`apply_or_notify.py`), without LLM refinement.
 
-**Шаг 1:** вызвать `scripts/run.py::run(text, area, hours)` (или как отдельный
-процесс: `python run.py --text "..." --hours 6`). Это и есть весь workflow —
-дальше он сам:
+**Step 1:** call `scripts/run.py::run(text, area, hours)` (or run it as a
+standalone process: `python run.py --text "..." --hours 6`). That's the
+entire workflow — from here it runs itself:
 
-1. **Job Sources**: `search_jobs.py` — забирает вакансии из источников с
-   `enabled: true` в `references/job_sources.json` (16 полных адаптеров:
-   API + RSS + key-based, остальные — заглушки под scrape).
-2. **Filters + Database**: `state.py` — дедуп по id, сохраняет вакансию и
-   статус, ведёт историю переходов. Всё это — код, без ИИ.
-3. **Score/Filter**: `match_score.py::score_vacancy()` — детерминированная
-   оценка по `references/criteria.json` (роли, стек, зарплата, локация,
-   красные флаги, чёрный список). Вакансии с явным red_flag или score ниже
-   `match_score.LOW_BAR_FOR_LLM` отсеиваются здесь же, без обращения к модели.
-4. **LLM Task** (только для вакансий, прошедших шаг 3, и только если Gateway
-   подключен): `llm_gateway.vacancy_fit()` — "подходит ли вакансия?", и
-   `llm_gateway.cv_match()` — "какие навыки совпадают/отсутствуют?". Итоговый
-   score — среднее кодового и LLM-score.
-5. Если итоговый score >= `match.score_threshold`:
+1. **Job Sources**: `search_jobs.py` — fetches vacancies from sources
+   with `enabled: true` in `references/job_sources.json` (16 full
+   adapters: API + RSS + key-based, the rest are scrape stubs).
+2. **Filters + Database**: `state.py` — deduplicates by id, stores the
+   vacancy and its status, tracks the transition history. All code, no AI.
+3. **Score/Filter**: `match_score.py::score_vacancy()` — deterministic
+   scoring against `references/criteria.json` (roles, stack, salary,
+   location, red flags, blacklist). Vacancies with an explicit red_flag
+   or a score below `match_score.LOW_BAR_FOR_LLM` are dropped here,
+   without calling the model.
+4. **LLM Task** (only for vacancies that passed step 3, and only if the
+   Gateway is wired): `llm_gateway.vacancy_fit()` — "is this vacancy a
+   fit?", and `llm_gateway.cv_match()` — "which skills match / are
+   missing?". The final score is the average of the code and LLM scores.
+5. If the final score is >= `match.score_threshold`:
    a. **Application Workflow**: `apply_or_notify.py::process_vacancy()` —
-      генерирует сопроводительное (`llm_gateway.personalize_application()`,
-      либо шаблон без ИИ) и, если источник hh.ru и заданы `HH_ACCESS_TOKEN`
-      + `HH_RESUME_ID`, опционально подаёт отклик через API.
-   b. `telegram_notify.notify_vacancy()` — вакансия + score + причина +
-      сопроводительное + статус (отправлено само / нужно подтвердить вручную).
-6. Если score ниже порога — вакансия помечается `rejected`, не показывается.
-7. В конце `run()` возвращает `{"checked", "matched", "great", "applied"}` —
-   это и есть payload события **JOB_SEARCH_COMPLETED** (см. `PROTOCOL.md`).
-   Передать это пользователю в Telegram может либо сам Hermes (получив
-   возврат вызова), либо `telegram_notify.notify_job_search_completed(stats)`,
-   если скрипт запущен отдельным процессом.
+      generates a cover letter (`llm_gateway.personalize_application()`,
+      or a template without AI) and, if the source is hh.ru and
+      `HH_ACCESS_TOKEN` + `HH_RESUME_ID` are set, optionally submits an
+      application through the API.
+   b. `telegram_notify.notify_vacancy()` — vacancy + score + reason +
+      cover letter + status (auto-sent / needs manual confirmation).
+6. If the score is below the threshold, the vacancy is marked
+   `rejected` and not shown.
+7. At the end `run()` returns `{"checked", "matched", "great",
+   "applied"}` — the payload of the **JOB_SEARCH_COMPLETED** event (see
+   `PROTOCOL.md`). Either Hermes forwards it to Telegram (by capturing
+   the return value) or, if the script runs as a standalone process,
+   `telegram_notify.notify_job_search_completed(stats)` does it.
 
 ## Pitfalls
 
-- Не включать источники с `access: scrape` в `job_sources.json` без явного
-  согласия пользователя — это может нарушать условия использования площадки.
-- Не пытаться автоматизировать LinkedIn/Indeed — публичного API для отклика
-  нет, риск блокировки аккаунта пользователя.
-- Не звать LLM Gateway для вакансий, не прошедших `match_score.py` — это
-  единственная причина, по которой пайплайн остаётся дешёвым при большом
-  потоке вакансий. Если этот порядок нарушить (сначала LLM, потом фильтр),
-  расходы на модель вырастут на порядок без выигрыша в качестве.
-- Порог `match.score_threshold` калибровать вместе с пользователем в первые
-  дни — слишком низкий спамит нерелевантным, слишком высокий пропускает
-  хорошие варианты.
-- `hermes_backend.py` вызывает `hermes -z` под-процессом на каждую LLM-задачу
-  (до 3 вызовов на вакансию, прошедшую пре-фильтр) — при большом потоке
-  вакансий это добавляет заметную латентность и расход по модели у
-  провайдера (openrouter). Это ожидаемо и совпадает с дизайном пайплайна
-  (LLM зовётся только после дешёвого код-фильтра), но стоит иметь в виду при
-  калибровке `search.interval_hours`.
+- Do not enable sources with `access: scrape` in `job_sources.json`
+  without the user's explicit consent — it may violate the site's terms.
+- Do not try to automate LinkedIn / Indeed — there is no public
+  application API, and the user's account may get blocked.
+- Do not call the LLM Gateway for vacancies that did not pass
+  `match_score.py` — this is the single reason the pipeline stays cheap
+  under a heavy vacancy stream. Reversing the order (LLM first, filter
+  second) increases model spend by an order of magnitude with no quality
+  gain.
+- Calibrate `match.score_threshold` together with the user in the first
+  days — too low spams irrelevant items, too high skips good matches.
+- `hermes_backend.py` invokes `hermes -z` as a subprocess for every LLM
+  task (up to 3 calls per pre-filtered vacancy). Under a heavy stream
+  this adds noticeable latency and provider model spend (openrouter).
+  This is expected and matches the pipeline design (LLM is only called
+  after the cheap code filter), but keep it in mind when calibrating
+  `search.interval_hours`.
 
 ## Verification
 
-- После первого запуска показать пользователю `JOB_SEARCH_COMPLETED` целиком
-  (checked/matched/great/applied), чтобы можно было скорректировать критерии
-  или порог.
-- Проверить, что сообщения реально доходят до Telegram: `python
+- After the first run, show the user the full `JOB_SEARCH_COMPLETED`
+  payload (checked/matched/great/applied) so they can adjust criteria
+  or the threshold.
+- Verify that messages actually reach Telegram: `python
   scripts/telegram_notify.py --test`.
-- Проверить, что backend реально подключился: `python scripts/hermes_backend.py`
-  — прогоняет один тестовый вызов task=vacancy_fit на фиктивных данных через
-  `hermes -z` и печатает результат. Если падает — `llm_gateway.is_configured()`
-  всё равно вернёт False внутри `run()`, и workflow тихо задеградирует до
-  чисто кодового режима (не ошибка, но пользователь должен знать, что сейчас
-  работает именно так).
+- Verify that the backend is really wired: `python
+  scripts/hermes_backend.py` — runs a single test call with
+  task=vacancy_fit on dummy data through `hermes -z` and prints the
+  result. If it fails, `llm_gateway.is_configured()` will return False
+  inside `run()` and the workflow will silently degrade to code-only
+  mode (not an error, but the user should know that's what is happening).
